@@ -1,4 +1,4 @@
-DATA_SOURCE_DIR=/home/ubuntu/big-data-datasets/stack-exchange-uncompressed
+DATA_SOURCE_DIR=/home/ubuntu/big-data-datasets/stack-exchange
 S3_BUCKET_NAME=big-dataset-stackexchange
 S3_FOLDER_NAME=compressed
 
