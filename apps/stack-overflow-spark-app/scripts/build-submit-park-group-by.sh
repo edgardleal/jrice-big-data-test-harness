@@ -1,0 +1,1 @@
+time ./build-spark-group-by.sh && time ./submit-spark-group-by.sh
