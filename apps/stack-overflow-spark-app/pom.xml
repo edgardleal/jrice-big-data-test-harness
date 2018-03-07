@@ -12,7 +12,6 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
-  
   <dependencies>
     <dependency>
       <groupId>org.apache.spark</groupId>
@@ -36,9 +35,13 @@
     </dependency>
     <dependency>
       <groupId>com.databricks</groupId>
-      <artifactId>spark-xml_2.10</artifactId>
+      <artifactId>spark-xml_2.11</artifactId>
       <version>0.4.1</version>
     </dependency>
-
+    <dependency>
+      <groupId>com.databricks</groupId>
+      <artifactId>spark-avro_2.11</artifactId>
+      <version>4.0.0</version>
+    </dependency>
   </dependencies>
 </project>

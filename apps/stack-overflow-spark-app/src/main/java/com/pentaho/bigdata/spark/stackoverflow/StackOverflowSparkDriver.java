@@ -16,14 +16,16 @@ import org.apache.spark.sql.SparkSession;
  * Joe Rice 2/3/2018
  */
 public class StackOverflowSparkDriver {
-  private final static String BADGES_XML_FILE = "file:/home/vagrant/git/jrice-big-data-test-harness/apps/stack-overflow-spark-app/src/main/resources/sample-xml-files/devops.stackexchange.com/Badges.xml";
-  private final static String COMMENTS_XML_FILE = "file:/home/vagrant/git/jrice-big-data-test-harness/apps/stack-overflow-spark-app/src/main/resources/sample-xml-files/devops.stackexchange.com/Comments.xml";
-  private final static String POST_HISTORY_XML_FILE = "file:/home/vagrant/git/jrice-big-data-test-harness/apps/stack-overflow-spark-app/src/main/resources/sample-xml-files/devops.stackexchange.com/PostHistory.xml";
-  private final static String POST_LINKS_XML_FILE = "file:/home/vagrant/git/jrice-big-data-test-harness/apps/stack-overflow-spark-app/src/main/resources/sample-xml-files/devops.stackexchange.com/PostLinks.xml";
-  private final static String POSTS_XML_FILE = "file:/home/vagrant/git/jrice-big-data-test-harness/apps/stack-overflow-spark-app/src/main/resources/sample-xml-files/devops.stackexchange.com/Posts.xml";
-  private final static String TAGS_XML_FILE = "file:/home/vagrant/git/jrice-big-data-test-harness/apps/stack-overflow-spark-app/src/main/resources/sample-xml-files/devops.stackexchange.com/Tags.xml";
-  private final static String USERS_XML_FILE = "file:/home/vagrant/git/jrice-big-data-test-harness/apps/stack-overflow-spark-app/src/main/resources/sample-xml-files/devops.stackexchange.com/Users.xml";
-  private final static String VOTES_XML_FILE = "file:/home/vagrant/git/jrice-big-data-test-harness/apps/stack-overflow-spark-app/src/main/resources/sample-xml-files/devops.stackexchange.com/Votes.xml";
+  private final static String BADGES_XML_FILE = "Badges.xml";
+  private final static String COMMENTS_XML_FILE = "Comments.xml";
+  private final static String POST_HISTORY_XML_FILE =
+    "PostHistory.xml";
+  private final static String POST_LINKS_XML_FILE =
+    "PostLinks.xml";
+  private final static String POSTS_XML_FILE = "Posts.xml";
+  private final static String TAGS_XML_FILE = "Tags.xml";
+  private final static String USERS_XML_FILE = "Users.xml";
+  private final static String VOTES_XML_FILE = "Votes.xml";
 
   private final static String BADGES_TABLE_NAME = "badges";
   private final static String COMMENTS_TABLE_NAME = "comments";
@@ -45,15 +47,24 @@ public class StackOverflowSparkDriver {
     SparkContext sc = spark.sparkContext();
     JavaSparkContext jsc = JavaSparkContext.fromSparkContext( sc );
 
-    Dataset<Row> badgesDataFrame = loadXmlSource( spark, BADGES_XML_FILE, BADGES_TABLE_NAME, "badges" );
-    Dataset<Row> commentsDataFrame = loadXmlSource( spark, COMMENTS_XML_FILE, COMMENTS_TABLE_NAME, "comments" );
-    Dataset<Row> postHistoryDataFrame = loadXmlSource( spark, POST_HISTORY_XML_FILE, POST_HISTORY_TABLE_NAME );
-    Dataset<Row> postLinksDataFrame = loadXmlSource( spark, POST_LINKS_XML_FILE, POST_LINKS_TABLE_NAME );
-    Dataset<Row> PostsDataFrame = loadXmlSource( spark, POSTS_XML_FILE, POSTS_TABLE_NAME );
-    Dataset<Row> tagsDataFrame = loadXmlSource( spark, TAGS_XML_FILE, TAGS_TABLE_NAME );
-    Dataset<Row> usersDataFrame = loadXmlSource( spark, USERS_XML_FILE, USERS_TABLE_NAME );
-    Dataset<Row> votesDataFrame = loadXmlSource( spark, VOTES_XML_FILE, VOTES_TABLE_NAME );
+    String inDir  = "hdfs:///user/pentaho/big-data-files/stackexchange/uncompressed/serverfault.com";
+    String outDir = "hdfs:///user/pentaho/big-data-files/stackexchange/avro/serverfault.com";
 
+    Dataset<Row> badgesDataFrame = loadXmlSource( spark, inDir, outDir, BADGES_XML_FILE, BADGES_TABLE_NAME );
+    Dataset<Row> commentsDataFrame = loadXmlSource( spark, inDir, outDir, COMMENTS_XML_FILE, COMMENTS_TABLE_NAME );
+    Dataset<Row> postHistoryDataFrame = loadXmlSource( spark, inDir, outDir, POST_HISTORY_XML_FILE, POST_HISTORY_TABLE_NAME );
+    Dataset<Row> postLinksDataFrame = loadXmlSource( spark, inDir, outDir, POST_LINKS_XML_FILE, POST_LINKS_TABLE_NAME );
+    Dataset<Row> PostsDataFrame = loadXmlSource( spark, inDir, outDir, POSTS_XML_FILE, POSTS_TABLE_NAME );
+    Dataset<Row> tagsDataFrame = loadXmlSource( spark, inDir, outDir, TAGS_XML_FILE, TAGS_TABLE_NAME );
+    Dataset<Row> usersDataFrame = loadXmlSource( spark, inDir, outDir, USERS_XML_FILE, USERS_TABLE_NAME );
+    Dataset<Row> votesDataFrame = loadXmlSource( spark, inDir, outDir, VOTES_XML_FILE, VOTES_TABLE_NAME );
+
+//    executeUserLocationQuery( spark );
+
+//    executeTopPostsByUserQuery( spark );
+  }
+
+  protected static void executeUserLocationQuery( SparkSession spark ) {
     String sqlQuery =
       "SELECT  _Location as Location, "
         + "  count(_Id) as numOfUsers, "
@@ -64,46 +75,77 @@ public class StackOverflowSparkDriver {
         + " GROUP BY Location "
         + " ORDER BY numOfUsers DESC, Location";
 
-    Dataset<Row>  topLocationsDf = spark.sql( sqlQuery );
+    Dataset<Row> topLocationsDf = spark.sql( sqlQuery );
 
-    topLocationsDf.show();
+    System.out.println( "\n\n\n\n\nexecuteUserLocationQuery\n\n");
+
+    //    topLocationsDf.show( 200 );
   }
 
-  protected static Dataset<Row> loadXmlSource(SparkSession spark, String XmlFileName, String tableName) {
-    return loadXmlSource( spark, XmlFileName, tableName, null );
+  protected static void executeTopPostsByUserQuery( SparkSession spark ) {
+    String sqlQuery =
+      "SELECT  users._Id as userId, "
+        + "    users._DisplayName as displayName, "
+        + "    users._Location as location, "
+        + "    users._Reputation as reputation, "
+        + "    count(distinct posts._Id) as numOfPosts, "
+        + "    count(distinct comments._Id) as numOfComments, "
+        + "    max(posts._ViewCount) as maxPostViews, "
+        + "    max(comments._Score) as maxCommentsScore "
+        + " FROM  " + USERS_TABLE_NAME + " AS users,"
+        + "       " + POSTS_TABLE_NAME + " AS posts,"
+        + "       " + COMMENTS_TABLE_NAME + " AS comments"
+        + " WHERE users._Id = posts._OwnerUserId "
+        + "   AND users._Id = comments._UserId"
+        + " GROUP BY users._Id, "
+        + "          users._DisplayName, "
+        + "          users._Location, "
+        + "          users._Reputation "
+        + " ORDER BY numOfPosts DESC, "
+        + "          users._Id  ";
+
+    Dataset<Row> topLocationsDf = spark.sql( sqlQuery );
+
+    System.out.println( "\n\n\n\n\nexecuteTopPostsByUserQuery\n\n");
+
+    topLocationsDf.show( 200 );
   }
-  protected static Dataset<Row> loadXmlSource(SparkSession spark, String XmlFileName, String tableName, String rootElement) {
+
+  protected static Dataset<Row> loadXmlSource( SparkSession spark, String inDir, String outDir, String XmlFileName, String tableName ) {
     String sourceTableName = tableName + "_src";
+
+    System.out.println( "\n\n\n\n\nLoading XML File: " + inDir + "/" + XmlFileName + "\n\n");
 
     Dataset<Row> dataFrame = spark
       .read()
       .format( "com.databricks.spark.xml" )
-      .option("rowTag", tableName)
-      .load( XmlFileName );
-
-    System.out.println( "\n\n\nPrinting Schema and Table for " + sourceTableName );
-    // Print the sales data schema to the console.
-//    dataFrame.printSchema();
-//
-//    // Print 100 rows of sales data Dataframe to the console.
-//    dataFrame.show( 100 );
+      .option( "rowTag", tableName )
+      .load( inDir + "/" + XmlFileName );
 
     // register the table
     dataFrame.registerTempTable( sourceTableName );
+    dataFrame.cache();
 
     Dataset<Row> df = null;
 
-    df = spark.sql( "Select explode(row) as row from " + sourceTableName);
+    df = spark.sql( "Select explode(row) as row from " + sourceTableName );
 
-//    df.show();
+    //    df.show();
 
     df = df.select( "row.*" );
 
-    df.printSchema();
-    df.show(200);
+//    df.printSchema();
+//    df.show( 200 );
 
     // register the table
     df.registerTempTable( tableName );
+    df.cache();
+
+    System.out.println( "\n\nWriting Avro File: " + outDir + "/" + XmlFileName + "\n\n\n\n\n");
+
+    df.write()
+      .format("com.databricks.spark.avro")
+      .save(outDir + "/" + XmlFileName + ".avro");
 
     return df;
   }

@@ -1,9 +1,12 @@
-hdfs dfs -put Badges.xml hdfs:/user/pentaho/big-data-files/stackexchange/devops/Badges.xml
-hdfs dfs -put Comments.xml hdfs:/user/pentaho/big-data-files/stackexchange/devops/Comments.xml
-hdfs dfs -put PostHistory.xml hdfs:/user/pentaho/big-data-files/stackexchange/devops/PostHistory.xml
-hdfs dfs -put PostLinks.xml hdfs:/user/pentaho/big-data-files/stackexchange/devops/PostLinks.xml
-hdfs dfs -put v hdfs:/user/pentaho/big-data-files/stackexchange/devops/Posts.xml
-hdfs dfs -put Tags.xml hdfs:/user/pentaho/big-data-files/stackexchange/devops/Tags.xml
-hdfs dfs -put Users.xml hdfs:/user/pentaho/big-data-files/stackexchange/devops/Users.xml
-hdfs dfs -put Votes.xml hdfs:/user/pentaho/big-data-files/stackexchange/devops/Votes.xml
+SOURCE_FILE_DIR=/home/vagrant/git/jrice-big-data-test-harness/apps/stack-overflow-spark-app/src/main/resources/sample-xml-files/devops.stackexchange.com
+TARGET_HDFS_DIR=hdfs:/user/pentaho/big-data-files/stackexchange/devops
+
+hdfs dfs -put $SOURCE_FILE_DIR/Badges.xml $TARGET_HDFS_DIR/Badges.xml
+hdfs dfs -put $SOURCE_FILE_DIR/Comments.xml $TARGET_HDFS_DIR/Comments.xml
+hdfs dfs -put $SOURCE_FILE_DIR/PostHistory.xml $TARGET_HDFS_DIR/PostHistory.xml
+hdfs dfs -put $SOURCE_FILE_DIR/PostLinks.xml $TARGET_HDFS_DIR/PostLinks.xml
+hdfs dfs -put $SOURCE_FILE_DIR/Posts.xml $TARGET_HDFS_DIR/Posts.xml
+hdfs dfs -put $SOURCE_FILE_DIR/Tags.xml $TARGET_HDFS_DIR/Tags.xml
+hdfs dfs -put $SOURCE_FILE_DIR/Users.xml $TARGET_HDFS_DIR/Users.xml
+hdfs dfs -put $SOURCE_FILE_DIR/Votes.xml $TARGET_HDFS_DIR/Votes.xml
 

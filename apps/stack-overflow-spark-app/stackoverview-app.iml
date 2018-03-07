@@ -161,6 +161,7 @@
     <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-mapreduce-client-jobclient:2.7.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-annotations:2.7.1" level="project" />
     <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.6" level="project" />
-    <orderEntry type="library" name="Maven: com.databricks:spark-xml_2.10:0.4.1" level="project" />
+    <orderEntry type="library" name="Maven: com.databricks:spark-xml_2.11:0.4.1" level="project" />
+    <orderEntry type="library" name="Maven: com.databricks:spark-avro_2.11:4.0.0" level="project" />
   </component>
 </module>
