@@ -71,8 +71,8 @@ variable "ec2-instance-type" {
   type = "map"
   default = {
     small.swarm-manager = "t2.micro"
-    small.admin-ui-web = "t2.micro"
-    small.admin-persistence = "t2.micro"
+    small.admin-ui-web = "t2.medium"
+    small.admin-persistence = "t2.large"
 
     medium.swarm-manager = "t2.medium"
     medium.admin-ui-web = "t2.medium"

@@ -1,0 +1,326 @@
+version: "3.3"
+
+networks:
+  network-app:
+  network-proxy:
+  jarch-infra-global-network-monitoring:
+    external: true
+
+volumes:
+  volume-prometheus:
+    driver: local
+  volume-influxdb:
+    driver: local
+  volume-grafana:
+    driver: local
+  volume-alertmanager:
+    driver: local
+
+configs:
+  caddy_config:
+    file: ./caddy/Caddyfile
+  dockerd_config:
+    file: ./dockerd-exporter/Caddyfile
+  node_rules:
+    file: ./prometheus/rules/swarm_node.rules
+  task_rules:
+    file: ./prometheus/rules/swarm_task.rules
+
+services:
+  proxy:
+    image: traefik:v1.4.2
+    ports:
+      - 82:80
+      - 8288:8080
+    networks:
+      -  network-proxy
+    command:
+      - --docker
+      - --docker.swarmmode
+      - --docker.domain=traefik
+      - --docker.watch
+      - --web
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - "traefik.docker.network=jarch-infra-monitoring_network-proxy"
+        - "traefik.port=8080"
+        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}monitoring-proxy.joericearchitect.com"
+        - "jra.environment-flip=blue"
+        - "jra.application-name=jarch-infra-monitoring-proxy"
+        - "jra.container-name=jarch-infra-monitoring-proxy"
+        - "jra.domain-name=${ENV_DOMAIN_PREFIX}monitoring-proxy.joericearchitect.com"
+
+  dockerd-exporter:
+    image: stefanprodan/caddy:0.10.10
+    networks:
+      - network-app
+      - network-proxy
+    environment:
+      - DOCKER_GWBRIDGE_IP=172.18.0.1
+    configs:
+      - source: dockerd_config
+        target: /etc/caddy/Caddyfile
+    deploy:
+      mode: global
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+      labels:
+        - "jra.environment-flip=blue"
+        - "jra.application-name=jarch-infra-monitoring-dockerd-exporter"
+        - "jra.container-name=jarch-infra-monitoring-dockerd-exporter"
+
+  cadvisor:
+    image: google/cadvisor:v0.28.0
+    ports:
+      - 8281:8080
+    networks:
+      - network-app
+      - network-proxy
+    command: -logtostderr -docker_only
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /:/rootfs:ro
+      - /var/run:/var/run
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    deploy:
+      mode: global
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+      labels:
+        - "traefik.docker.network=jarch-infra-monitoring_network-proxy"
+        - "traefik.port=8080"
+        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}cadvisor.joericearchitect.com"
+        - "jra.environment-flip=blue"
+        - "jra.application-name=jarch-infra-monitoring-cadvisor"
+        - "jra.container-name=jarch-infra-monitoring-cadvisor"
+        - "jra.domain-name=${ENV_DOMAIN_PREFIX}cadvisor.joericearchitect.com"
+
+  grafana:
+    image: joericearchitect/jarch-infra-grafana:1.0.0
+    ports:
+      - 3000:3000
+    networks:
+      - network-app
+      - network-proxy
+      - jarch-infra-global-network-monitoring
+    environment:
+      - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - volume-grafana:/var/lib/grafana
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.jra.swarm-node-type == infra-monitoring
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+      labels:
+        - "traefik.docker.network=jarch-infra-monitoring_network-proxy"
+        - "traefik.port=3000"
+        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}grafana.joericearchitect.com"
+        - "jra.environment-flip=blue"
+        - "jra.application-name=jarch-infra-grafana"
+        - "jra.container-name=jarch-infra-grafana"
+        - "jra.domain-name=${ENV_DOMAIN_PREFIX}grafana.joericearchitect.com"
+
+  alertmanager:
+    image: stefanprodan/swarmprom-alertmanager
+    ports:
+      - 9093:9093
+    networks:
+      - network-app
+      - network-proxy
+    environment:
+      - SLACK_URL=${SLACK_URL:-https://hooks.slack.com/services/TOKEN}
+      - SLACK_CHANNEL=${SLACK_CHANNEL:-general}
+      - SLACK_USER=${SLACK_USER:-alertmanager}
+    command:
+      - '-config.file=/etc/alertmanager/alertmanager.yml'
+      - '-storage.path=/alertmanager'
+    volumes:
+      - volume-alertmanager:/alertmanager
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.jra.swarm-node-type == infra-monitoring
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+      labels:
+        - "traefik.docker.network=jarch-infra-monitoring_network-proxy"
+        - "traefik.port=9093"
+        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}alerts.joericearchitect.com"
+        - "jra.environment-flip=blue"
+        - "jra.application-name=jarch-infra-alertmanager"
+        - "jra.container-name=jarch-infra-alertmanager"
+        - "jra.domain-name=${ENV_DOMAIN_PREFIX}alerts.joericearchitect.com"
+
+  unsee:
+    image: cloudflare/unsee:v0.8.0
+    ports:
+      - 9094:8080
+    networks:
+      - network-app
+      - network-proxy
+    environment:
+      - "ALERTMANAGER_URIS=default:http://alertmanager:9093"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.jra.swarm-node-type == infra-monitoring
+      labels:
+        - "traefik.docker.network=jarch-infra-monitoring_network-proxy"
+        - "traefik.port=8080"
+        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}unsee.joericearchitect.com"
+        - "jra.environment-flip=blue"
+        - "jra.application-name=jarch-infra-unsee"
+        - "jra.container-name=jarch-infra-unsee"
+        - "jra.domain-name=${ENV_DOMAIN_PREFIX}unsee.joericearchitect.com"
+
+  node-exporter:
+    image: stefanprodan/swarmprom-node-exporter
+    ports:
+      - 9100:9100
+    networks:
+      - network-app
+      - network-proxy
+    environment:
+      - NODE_ID={{.Node.ID}}
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      - /etc/hostname:/etc/nodename
+    command:
+      - '-collector.textfile.directory=/etc/node-exporter/'
+      - '-collector.procfs=/host/proc'
+      - '-collector.sysfs=/host/sys'
+      - '-collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+      - '-collectors.enabled=textfile,conntrack,diskstats,entropy,filefd,filesystem,loadavg,mdadm,meminfo,netdev,netstat,stat,time,vmstat'
+    deploy:
+      mode: global
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+      labels:
+        - "jra.environment-flip=blue"
+        - "jra.application-name=jarch-infra-monitoring-node-exporter"
+        - "jra.container-name=jarch-infra-monitoring-node-exporter"
+
+  elasticsearch-exporter:
+    image: justwatch/elasticsearch_exporter:1.0.1
+    ports:
+      - 9108:9108
+    networks:
+      - network-app
+      - jarch-infra-global-network-monitoring
+    command:
+       - '-es.uri=http://elasticsearch:9200'
+    restart: always
+
+  prometheus:
+    image: joericearchitect/jarch-infra-prometheus:1.0.0
+    ports:
+      - 9090:9090
+    networks:
+      - network-app
+      - network-proxy
+      - jarch-infra-global-network-monitoring
+    command:
+      - '-config.file=/etc/prometheus/prometheus.yml'
+      - '-storage.local.path=/prometheus'
+      - '-web.console.libraries=/etc/prometheus/console_libraries'
+      - '-web.console.templates=/etc/prometheus/consoles'
+      - '-storage.local.target-heap-size=1073741824'
+      - '-storage.local.retention=24h'
+      - '-alertmanager.url=http://alertmanager:9093'
+    volumes:
+      - volume-prometheus:/prometheus
+    configs:
+      - source: node_rules
+        target: /etc/prometheus/swarm_node.rules
+      - source: task_rules
+        target: /etc/prometheus/swarm_task.rules
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.jra.swarm-node-type == infra-monitoring
+      resources:
+        limits:
+          memory: 2048M
+        reservations:
+          memory: 1024M
+      labels:
+        - "traefik.docker.network=jarch-infra-monitoring_network-proxy"
+        - "traefik.port=9090"
+        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}prometheus.joericearchitect.com"
+        - "jra.environment-flip=blue"
+        - "jra.application-type=time-database"
+        - "jra.application-sub-type=prometheus"
+        - "jra.application-name=jarch-infra-prometheus"
+        - "jra.container-name=jarch-infra-prometheus"
+        - "jra.domain-name=${ENV_DOMAIN_PREFIX}prometheus.joericearchitect.com"
+
+  influxdb:
+    image: influxdb:1.4.2
+    ports:
+      - 8086:8086
+    networks:
+      - network-app
+      - network-proxy
+      - jarch-infra-global-network-monitoring
+    environment:
+      - INFLUXDB_DB=jmeter
+      - INFLUXDB_HTTP_AUTH_ENABLED=false
+    volumes:
+      - volume-influxdb:/var/lib/influxdb
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.jra.swarm-node-type == infra-monitoring
+      resources:
+        limits:
+          memory: 2048M
+        reservations:
+          memory: 1024M
+      labels:
+        - "traefik.docker.network=jarch-infra-monitoring_network-proxy"
+        - "traefik.port=8086"
+        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}influxdb.joericearchitect.com"
+        - "jra.environment-flip=blue"
+        - "jra.application-type=time-database"
+        - "jra.application-sub-type=influxdb"
+        - "jra.application-name=jarch-infra-influxdb"
+        - "jra.container-name=jarch-infra-influxdb"
+        - "jra.domain-name=${ENV_DOMAIN_PREFIX}influxdb.joericearchitect.com"
+        

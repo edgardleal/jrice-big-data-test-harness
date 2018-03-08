@@ -1,0 +1,121 @@
+version: '3'
+
+networks:
+  network-proxy:
+  network-app:
+  bdth-infra-global-network-monitoring:
+    external: true
+
+volumes:
+  volume-elasticsearch-data:
+    driver: local
+  volume-fluentd-data:
+    driver: local
+
+services:
+ 
+  proxy:
+    image: traefik:v1.4.2
+    ports:
+      - 81:80
+      - 8188:8080
+    networks:
+      - network-proxy
+    command:
+      - --docker
+      - --docker.swarmmode
+      - --docker.domain=traefik
+      - --docker.watch
+      - --web
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      labels:
+        - "traefik.docker.network=bdth-admin-logging_network-proxy"
+        - "traefik.port=8080"
+        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}logging-proxy.joericearchitect.com"
+        - "bdth.environment-flip=blue"
+        - "bdth.application-name=bdth-admin-logging-proxy"
+        - "bdth.container-name=bdth-admin-logging-logging-proxy"
+        - "bdth.domain-name=${ENV_DOMAIN_PREFIX}logging-proxy.joericearchitect.com"
+
+  elasticsearch:
+    image: joericearchitect/jarch-infra-elasticsearch:1.0.0
+    ports:
+      - 8191:9200
+      - 8192:9300
+    networks:
+      - network-proxy
+      - network-app
+      - bdth-infra-global-network-monitoring
+    environment:
+      - xpack.security.enabled=false
+    command:
+      - elasticsearch
+    volumes:
+      - volume-elasticsearch-data:/usr/share/elasticsearch/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.bdth.swarm-node-type == admin-persistence]
+      labels:
+        - "traefik.docker.network=bdth-admin-logging_network-proxy"
+        - "traefik.port=9200"
+        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}es.joericearchitect.com"
+        - "bdth.environment-flip=blue"
+        - "bdth.application-type=database"
+        - "bdth.application-sub-type=elasticsearch"
+        - "bdth.application-name=bdth-admin-logging-elasticsearch"
+        - "bdth.container-name=bdth-admin-logging-elasticsearch"
+        - "bdth.domain-name=${ENV_DOMAIN_PREFIX}es.joericearchitect.com"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:6.0.0
+    depends_on:
+      - elasticsearch
+    ports:
+      - 8187:5601
+    networks:
+      - network-proxy
+      - network-app
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.bdth.swarm-node-type == admin-ui-web]
+      labels:
+        - "traefik.docker.network=bdth-admin-logging_network-proxy"
+        - "traefik.port=5601"
+        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}kibana.joericearchitect.com"
+        - "bdth.environment-flip=blue"
+        - "bdth.application-name=bdth-admin-logging-kibana"
+        - "bdth.container-name=bdth-admin-logging-kibana"
+        - "bdth.domain-name=${ENV_DOMAIN_PREFIX}kibana.joericearchitect.com"
+
+  fluentd:
+    image: joericearchitect/jarch-infra-fluentd-es
+    depends_on:
+      - elasticsearch
+    ports:
+      - 8182:24224
+    networks:
+      - network-proxy
+      - network-app
+    volumes:
+      - volume-fluentd-data:/fluentd/log
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.bdth.swarm-node-type == admin-persistence]
+      labels:
+        - "traefik.docker.network=bdth-admin-logging_network-proxy"
+        - "traefik.port=24284"
+        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}fluentd.joericearchitect.com"
+        - "bdth.environment-flip=blue"
+        - "bdth.application-name=bdth-admin-logging-fluentd"
+        - "bdth.container-name=bdth-admin-logging-fluentd"
+        - "bdth.domain-name=${ENV_DOMAIN_PREFIX}fluentd.joericearchitect.com"

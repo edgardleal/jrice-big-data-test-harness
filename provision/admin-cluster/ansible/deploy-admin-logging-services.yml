@@ -3,7 +3,7 @@
 # into two groups:
 #   - swarm_manager_operational (swarm is running and active)
 #   - swarm_manager_bootstrap (host needs to be joined to the cluster)
-- hosts: tag_jra_environment_{{ env }}:&tag_jra_swarm_instance_type_swarm_manager
+- hosts: tag_bdth_environment_{{ env }}:&tag_bdth_swarm_instance_type_swarm_manager
   become: true
   tasks:
     - name: determine swarm status
@@ -28,7 +28,7 @@
       run_once: true
 
 # Configure the logging linux host that will run elastic search with production settings
-- hosts: tag_jra_environment_{{ env }}:&tag_jra_swarm_node_type_infra_logging
+- hosts: tag_bdth_environment_{{ env }}:&tag_bdth_swarm_node_type_admin_persistence
   become: true
   tasks:
     - name: update the mmap limit because elasticsearch needs it
@@ -44,16 +44,16 @@
   tasks:
     - name: create the docker script files directory it doesn't already exist
       shell: >
-        sudo mkdir -p /usr/local/jra/scripts/compose/jarch-infra-logging-stack
+        sudo mkdir -p /usr/local/bdth/scripts/compose/bdth-admin-logging-stack
       ignore_errors: yes
 
     - name: copy the stack files
       copy:
         src: "{{ stack_file_dir }}/"
-        dest: /usr/local/jra/scripts/compose/jarch-infra-logging-stack/
+        dest: /usr/local/bdth/scripts/compose/bdth-admin-logging-stack/
 
     - name: deploy central logging stack
       shell: >
-        ENV_DOMAIN_PREFIX={{ env_domain_prefix }} docker stack deploy jarch-infra-logging -c {{ stack_file_name }}
+        ENV_DOMAIN_PREFIX={{ env_domain_prefix }} docker stack deploy bdth-admin-logging -c {{ stack_file_name }}
       args:
-        chdir: /usr/local/jra/scripts/compose/jarch-infra-logging-stack/
+        chdir: /usr/local/bdth/scripts/compose/bdth-admin-logging-stack/

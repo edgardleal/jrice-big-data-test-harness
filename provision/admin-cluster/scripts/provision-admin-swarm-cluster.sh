@@ -13,14 +13,13 @@ DIR="$(cd "$(dirname "$0")" && pwd)"
 
 source $DIR/setenv.sh
 
-PLAYBOOK_DIR=$DIR/../ansible
-PLAYBOOK_FILE=./provision-swarm-cluster.yml
+PLAYBOOK_FILE=./provision-admin-swarm-cluster.yml
 EC2_INVENTORY_FILE=./ec2-inventory/ec2.py
 PLAYBOOK_VAR_ENV=prod
 PLAYBOOK_VAR_DOMAIN_PREFIX="prod."
 DOCKER_INSTALL_VERSION=17.12.0~ce-0~ubuntu
 
-cd $PLAYBOOK_DIR
+cd $BDTH_ADMIN_PLAYBOOK_DIR
 
 time ansible-playbook \
    -i $EC2_INVENTORY_FILE \
