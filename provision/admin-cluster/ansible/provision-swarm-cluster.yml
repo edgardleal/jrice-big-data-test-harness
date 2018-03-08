@@ -1,0 +1,243 @@
+---
+# Install Python on all instances
+- hosts: tag_bdth_environment_{{ env }}
+  gather_facts: False
+  become: true
+  
+  tasks:
+  - name: install python 2
+    raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal && sudo apt install -y python-pip && sudo pip install docker)
+    
+# Install Docker on all instances
+- hosts: tag_bdth_environment_{{ env }}
+  become: true
+  tasks:
+    - name: Docker CE Install - Update apt package index
+      shell: >
+        sudo apt-get update
+
+    - name: Docker CE Install - Install Packages to allow install of Dockre
+      shell: >
+        sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+
+    - name: Docker CE Install - Add Docker's official GPG key
+      shell: >
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+    - name: Docker CE Install - Set up the docker repository
+      shell: >
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+    - name: Docker CE Install - Update the apt package index again
+      shell: >
+        sudo apt-get update
+
+    - name: Docker CE Install - Install Docker CE
+      shell: >
+        sudo apt-get install -y docker-ce={{ docker_install_version }}
+
+    - name: Docker CE Install - Add the Docker Group
+      shell: >
+        sudo groupadd -f docker
+
+    - name: Docker CE Install - Set user to docker group
+      shell: >
+        sudo usermod -aG docker ubuntu
+
+# determine the status of each manager node and break them
+# into two groups:
+#   - swarm_manager_operational (swarm is running and active)
+#   - swarm_manager_bootstrap (host needs to be joined to the cluster)
+- hosts: tag_bdth_environment_{{ env }}:&tag_bdth_swarm_instance_type_swarm_manager
+  become: true
+  tasks:
+    - name: determine swarm status
+      shell: >
+        docker info | egrep '^Swarm: ' | cut -d ' ' -f2
+      register: swarm_status
+
+    - name: create swarm_manager_operational group
+      add_host:
+        hostname: "{{ item }}"
+        groups: swarm_manager_operational
+      with_items: "{{ ansible_play_hosts | default(play_hosts) }}"
+      when: "'active' in hostvars[item].swarm_status.stdout_lines"
+      run_once: true
+
+    - name: create swarm_manager_bootstrap group
+      add_host:
+        hostname: "{{ item }}"
+        groups: swarm_manager_bootstrap
+      with_items: "{{ ansible_play_hosts | default(play_hosts) }}"
+      when: "'active' not in hostvars[item].swarm_status.stdout_lines"
+      run_once: true
+
+# determine the status of each worker node and break them
+# into two groups:
+#   - swarm_worker_operational (host is joined to the swarm cluster)
+#   - swarm_worker_bootstrap (host needs to be joined to the cluster)
+- hosts: tag_bdth_environment_{{ env }}:&tag_bdth_swarm_instance_type_swarm_worker
+  become: true
+  tasks:
+    - name: determine swarm status
+      shell: >
+        docker info | egrep '^Swarm: ' | cut -d ' ' -f2
+      register: swarm_status
+
+    - name: create swarm_worker_operational group
+      add_host:
+        hostname: "{{ item }}"
+        groups: swarm_worker_operational
+      with_items: "{{ ansible_play_hosts | default(play_hosts) }}"
+      when: "'active' in hostvars[item].swarm_status.stdout_lines"
+      run_once: true
+
+    - name: create swarm_worker_bootstrap group
+      add_host:
+        hostname: "{{ item }}"
+        groups: swarm_worker_bootstrap
+      with_items: "{{ ansible_play_hosts | default(play_hosts) }}"
+      when: "'active' not in hostvars[item].swarm_status.stdout_lines"
+      run_once: true
+
+# when the swarm_manager_operational group is empty, meaning there
+# are no hosts running swarm, we need to initialize one of the hosts
+# then add it to the swarm_manager_operational group
+- hosts: swarm_manager_bootstrap[0]
+  become: true
+  vars:
+    swarm_node_host_name: "{{ ec2_private_dns_name | regex_replace('(ip-[0-9]*-[0-9]*-[0-9]*-[0-9]*)\\.[a-zA-Z0-9]*\\.[a-zA-Z0-9]*', '\\1')}}"
+  tasks:
+    - name: initialize swarm cluster
+      shell: >
+        docker swarm init
+        --advertise-addr={{ ec2_private_ip_address }}:2377
+        --listen-addr={{ ec2_private_ip_address }}:2377
+      when: "'swarm_manager_operational' not in groups"
+      register: bootstrap_first_node
+
+    - name: add labels to docker manager leader swarm node
+      shell: >
+        docker node update
+        --label-add bdth.instance-name={{ ec2_tag_bdth_instance_name }}
+        --label-add bdth.instance-name-full={{ ec2_tag_bdth_instance_name_full }}
+        --label-add bdth.swarm-node-name={{ ec2_tag_bdth_instance_name }}
+        --label-add bdth.swarm-node-name-full={{ ec2_tag_bdth_instance_name_full }}
+        --label-add bdth.environment={{ ec2_tag_bdth_environment }}
+        --label-add bdth.environment-instance-id={{ ec2_tag_bdth_environment_instance_id }}
+        --label-add bdth.failure-zone={{ ec2_tag_bdth_failure_zone }}
+        --label-add bdth.subnet-type={{ ec2_tag_bdth_subnet_type }}
+        --label-add bdth.swarm-instance-type={{ ec2_tag_bdth_swarm_instance_type }}
+        --label-add bdth.swarm-node-type={{ ec2_tag_bdth_swarm_node_type }}
+        --label-add bdth.swarm-manager-node-type=swarm-leader
+        '{{ swarm_node_host_name }}'
+
+    - name: add initialized host to swarm_manager_operational group
+      add_host:
+        hostname: "{{ item }}"
+        groups: swarm_manager_operational
+      with_items: "{{ ansible_play_hosts | default(play_hosts) }}"
+      when: bootstrap_first_node | changed
+
+# retrieve the swarm tokens and populate a list of ips listening on
+# the swarm port 2377
+- hosts: swarm_manager_operational[0]
+  become: true
+  vars:
+    iface: "{{ swarm_iface | default('eth0') }}"
+  tasks:
+    - name: retrieve swarm manager token
+      shell: docker swarm join-token -q manager
+      register: swarm_manager_token
+
+    - name: retrieve swarm worker token
+      shell: docker swarm join-token -q worker
+      register: swarm_worker_token
+
+    - name: populate list of manager ips
+      add_host:
+        hostname: "{{ hostvars[item]['ansible_' + iface]['ipv4']['address'] }}"
+        groups: swarm_manager_ips
+      with_items: "{{ ansible_play_hosts | default(play_hosts) }}"
+
+# join the manager hosts not yet initialized to the swarm cluster
+- hosts: swarm_manager_bootstrap:!swarm_manager_operational
+  become: true
+  vars:
+    token: "{{ hostvars[groups['swarm_manager_operational'][0]]['swarm_manager_token']['stdout'] }}"
+    swarm_node_host_name: "{{ ec2_private_dns_name | regex_replace('(ip-[0-9]*-[0-9]*-[0-9]*-[0-9]*)\\.[a-zA-Z0-9]*\\.[a-zA-Z0-9]*', '\\1')}}"
+  tasks:
+    - name: join manager follower nodes to cluster
+      shell: >
+        docker swarm join
+        --token={{ token }}
+        {{ groups['swarm_manager_ips'][0] }}:2377
+
+    - name: add labels to docker manager follower swarm node
+      shell: >
+        docker node update
+        --label-add bdth.instance-name={{ ec2_tag_bdth_instance_name }}
+        --label-add bdth.instance-name-full={{ ec2_tag_bdth_instance_name_full }}
+        --label-add bdth.swarm-node-name={{ ec2_tag_bdth_instance_name }}
+        --label-add bdth.swarm-node-name-full={{ ec2_tag_bdth_instance_name_full }}
+        --label-add bdth.environment={{ ec2_tag_bdth_environment }}
+        --label-add bdth.environment-instance-id={{ ec2_tag_bdth_environment_instance_id }}
+        --label-add bdth.failure-zone={{ ec2_tag_bdth_failure_zone }}
+        --label-add bdth.subnet-type={{ ec2_tag_bdth_subnet_type }}
+        --label-add bdth.swarm-instance-type={{ ec2_tag_bdth_swarm_instance_type }}
+        --label-add bdth.swarm-node-type={{ ec2_tag_bdth_swarm_node_type }}
+        --label-add bdth.swarm-manager-node-type=swarm-non-leader
+        '{{ swarm_node_host_name }}'
+
+       
+# join the worker hosts not yet initialized to the swarm cluster
+- hosts: swarm_worker_bootstrap
+  become: true
+  vars:
+    token: "{{ hostvars[groups['swarm_manager_operational'][0]]['swarm_worker_token']['stdout'] }}"
+    swarm_node_host_name: "{{ ec2_private_dns_name | regex_replace('(ip-[0-9]*-[0-9]*-[0-9]*-[0-9]*)\\.[a-zA-Z0-9]*\\.[a-zA-Z0-9]*', '\\1')}}"
+    swarm_manager_ip: "{{ groups['swarm_manager_bootstrap'][0] }}"
+  tasks:
+    - name: join worker nodes to cluster
+      shell: >
+        docker swarm join
+        --token={{ token }}
+        {{ groups['swarm_manager_ips'][0] }}:2377
+
+    - name: Print manager host name
+      debug: msg="manager-ip-address='{{ swarm_manager_ip }}'"
+
+    - name: add labels to docker worker swarm node
+      shell: >
+        docker node update
+        --label-add bdth.instance-name={{ ec2_tag_bdth_instance_name }}
+        --label-add bdth.instance-name-full={{ ec2_tag_bdth_instance_name_full }}
+        --label-add bdth.swarm-node-name={{ ec2_tag_bdth_instance_name }}
+        --label-add bdth.swarm-node-name-full={{ ec2_tag_bdth_instance_name_full }}
+        --label-add bdth.environment={{ ec2_tag_bdth_environment }}
+        --label-add bdth.environment-instance-id={{ ec2_tag_bdth_environment_instance_id }}
+        --label-add bdth.failure-zone={{ ec2_tag_bdth_failure_zone }}
+        --label-add bdth.subnet-type={{ ec2_tag_bdth_subnet_type }}
+        --label-add bdth.swarm-instance-type={{ ec2_tag_bdth_swarm_instance_type }}
+        --label-add bdth.swarm-node-type={{ ec2_tag_bdth_swarm_node_type }}
+        '{{ swarm_node_host_name }}'
+      delegate_to: "{{ swarm_manager_ip }}"
+
+# Create the global overlay networks that will be available to the swarm
+- hosts: swarm_manager_operational[0]
+  become: true
+  vars:
+    iface: "{{ swarm_iface | default('eth0') }}"
+  tasks:
+    - name: create global monitoring network
+      shell: >
+        docker network create --driver=overlay bdth-infra-global-network-monitoring
+        
+    - name: create global admin proxy overlay network
+      shell: >
+        docker network create --driver=overlay bdth-infra-global-network-proxy-admin
+      ignore_errors: yes
+
+
+  
+      
