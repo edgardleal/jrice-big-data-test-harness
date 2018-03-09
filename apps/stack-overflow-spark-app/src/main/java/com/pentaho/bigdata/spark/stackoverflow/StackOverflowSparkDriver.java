@@ -47,8 +47,8 @@ public class StackOverflowSparkDriver {
     SparkContext sc = spark.sparkContext();
     JavaSparkContext jsc = JavaSparkContext.fromSparkContext( sc );
 
-    String inDir  = "hdfs:///user/pentaho/big-data-files/stackexchange/uncompressed/serverfault.com";
-    String outDir = "hdfs:///user/pentaho/big-data-files/stackexchange/avro/serverfault.com";
+    String inDir = "s3://big-dataset-stackexchange/uncompressed/serverfault.com.7z";
+    String outDir = "s3://big-dataset-stackexchange/avro/serverfault.com";
 
     Dataset<Row> badgesDataFrame = loadXmlSource( spark, inDir, outDir, BADGES_XML_FILE, BADGES_TABLE_NAME );
     Dataset<Row> commentsDataFrame = loadXmlSource( spark, inDir, outDir, COMMENTS_XML_FILE, COMMENTS_TABLE_NAME );

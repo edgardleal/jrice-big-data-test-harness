@@ -15,6 +15,20 @@ volumes:
     driver: local
   volume-alertmanager:
     driver: local
+  volume-graphite-conf:
+    driver: local
+  volume-graphite-stat-storage:
+    driver: local
+  volume-graphite-functions-dir:
+    driver: local
+  volume-graphite-nginx-config:
+    driver: local
+  volume-graphite-statsd-config:
+    driver: local
+  volume-graphite-logrotate-config:
+    driver: local
+  volume-graphite-log-files:
+    driver: local
 
 configs:
   caddy_config:
@@ -233,19 +247,36 @@ services:
         - "bdth.application-name=bdth-admin-monitoring-node-exporter"
         - "bdth.container-name=bdth-admin-monitoring-node-exporter"
 
-  elasticsearch-exporter:
-    image: justwatch/elasticsearch_exporter:1.0.1
+  graphite-exporter:
+    image: joericearchitect/bdth-admin-graphite-exporter:1.0.0
     ports:
       - 9108:9108
+      - 8205:9109
     networks:
       - network-app
-      - bdth-infra-global-network-monitoring
+      - network-proxy
     command:
-       - '-es.uri=http://elasticsearch:9200'
-    restart: always
-
+      - -graphite.mapping-config=/tmp/graphite_mapping.conf
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.bdth.swarm-node-type == admin-monitoring
+      resources:
+        limits:
+          memory: 2048M
+        reservations:
+          memory: 1024M
+      labels:
+        - "bdth.environment-flip=blue"
+        - "bdth.application-type=time-database"
+        - "bdth.application-sub-type=graphite-exporter"
+        - "bdth.application-name=bdth-infra-graphite-exporter"
+        - "bdth.container-name=bdth-infra-graphite-exporter"
+        
   prometheus:
-    image: joericearchitect/jarch-infra-prometheus:1.0.0
+    image: joericearchitect/bdth-admin-prometheus:1.0.0
     ports:
       - 9090:9090
     networks:
@@ -323,4 +354,4 @@ services:
         - "bdth.application-name=bdth-infra-influxdb"
         - "bdth.container-name=bdth-infra-influxdb"
         - "bdth.domain-name=${ENV_DOMAIN_PREFIX}influxdb.joericearchitect.com"
-        
+
