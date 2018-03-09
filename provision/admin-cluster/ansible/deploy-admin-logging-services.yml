@@ -28,7 +28,7 @@
       run_once: true
 
 # Configure the logging linux host that will run elastic search with production settings
-- hosts: tag_bdth_environment_{{ env }}:&tag_bdth_swarm_node_type_admin_persistence
+- hosts: tag_bdth_environment_{{ env }}:&tag_bdth_swarm_node_type_admin_logging
   become: true
   tasks:
     - name: update the mmap limit because elasticsearch needs it

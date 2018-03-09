@@ -60,7 +60,7 @@ services:
     deploy:
       replicas: 1
       placement:
-        constraints: [node.labels.bdth.swarm-node-type == admin-persistence]
+        constraints: [node.labels.bdth.swarm-node-type == admin-logging]
       labels:
         - "traefik.docker.network=bdth-admin-logging_network-proxy"
         - "traefik.port=9200"
@@ -86,7 +86,7 @@ services:
     deploy:
       replicas: 1
       placement:
-        constraints: [node.labels.bdth.swarm-node-type == admin-ui-web]
+        constraints: [node.labels.bdth.swarm-node-type == admin-logging]
       labels:
         - "traefik.docker.network=bdth-admin-logging_network-proxy"
         - "traefik.port=5601"
@@ -110,7 +110,7 @@ services:
     deploy:
       replicas: 1
       placement:
-        constraints: [node.labels.bdth.swarm-node-type == admin-persistence]
+        constraints: [node.labels.bdth.swarm-node-type == admin-logging]
       labels:
         - "traefik.docker.network=bdth-admin-logging_network-proxy"
         - "traefik.port=24284"

@@ -47,7 +47,7 @@ resource "aws_elb" "elb-public" {
         interval = 15
     }
 
-    instances = ["${aws_instance.swarm-manager-az-1.id}", "${aws_instance.admin-ui-web-az-1.id}", "${aws_instance.admin-persistence-az-1.id}"]
+    instances = ["${aws_instance.swarm-manager-az-1.id}", "${aws_instance.admin-logging-az-1.id}", "${aws_instance.admin-monitoring-az-1.id}"]
     cross_zone_load_balancing = true
     idle_timeout = 400
     connection_draining = true

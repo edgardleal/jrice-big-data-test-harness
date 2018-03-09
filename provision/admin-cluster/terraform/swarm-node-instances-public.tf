@@ -27,12 +27,12 @@ resource "aws_instance" "swarm-manager-az-1" {
     }
 }
 
-resource "aws_instance" "admin-ui-web-az-1" {
+resource "aws_instance" "admin-logging-az-1" {
 	ami = "${lookup(var.amis_docker_node, "${var.region}")}"
 	availability_zone = "${lookup(var.availability_zone, "${var.region}.az-1")}"
-	instance_type = "${lookup(var.ec2-instance-type, "${var.environment-size}.admin-ui-web")}"
+	instance_type = "${lookup(var.ec2-instance-type, "${var.environment-size}.admin-logging")}"
 	key_name = "${var.aws_key_name}"
-	security_groups = ["${aws_security_group.public_admin-ui-web.id}"]
+	security_groups = ["${aws_security_group.public_admin-logging.id}"]
 	subnet_id = "${aws_subnet.az-1-public.id}",
 	monitoring = "true",
 	provisioner "local-exec" {
@@ -40,24 +40,25 @@ resource "aws_instance" "admin-ui-web-az-1" {
     }
 
 	tags {
-        Name = "${var.environment}.instance.swarm-worker.admin-ui-web.${var.environment}.${lookup(var.availability_zone, "${var.region}.az-1")}",
-        bdth.instance-name-full = "${var.environment}.instance.swarm-worker.admin-ui-web.${var.environment}.${lookup(var.availability_zone, "${var.region}.az-1")}"
-        bdth.instance-name = "admin-ui-web-${var.region}-az-1"
+        Name = "${var.environment}.instance.swarm-worker.admin-logging.${var.environment}.${lookup(var.availability_zone, "${var.region}.az-1")}",
+        bdth.instance-name-full = "${var.environment}.instance.swarm-worker.admin-logging.${var.environment}.${lookup(var.availability_zone, "${var.region}.az-1")}"
+        bdth.instance-name = "admin-logging-${var.region}-az-1"
         bdth.environment = "${var.environment}"
     	bdth.failure-zone = "${var.region}-az-1"
         bdth.environment-instance-id = "${random_id.env-instance.b64}"
     	bdth.swarm-instance-type = "swarm-worker"
-    	bdth.swarm-node-type = "admin-ui-web"
+    	bdth.swarm-node-type = "admin-logging"
     	bdth.subnet-type = "public"
     }
 }
 
-resource "aws_instance" "admin-persistence-az-1" {
+
+resource "aws_instance" "admin-monitoring-az-1" {
 	ami = "${lookup(var.amis_docker_node, "${var.region}")}"
 	availability_zone = "${lookup(var.availability_zone, "${var.region}.az-1")}"
-	instance_type = "${lookup(var.ec2-instance-type, "${var.environment-size}.admin-persistence")}"
+	instance_type = "${lookup(var.ec2-instance-type, "${var.environment-size}.admin-monitoring")}"
 	key_name = "${var.aws_key_name}"
-	security_groups = ["${aws_security_group.public_admin-persistence.id}"]
+	security_groups = ["${aws_security_group.public_admin-monitoring.id}"]
 	subnet_id = "${aws_subnet.az-1-public.id}",
 	monitoring = "true",
 	provisioner "local-exec" {
@@ -65,14 +66,14 @@ resource "aws_instance" "admin-persistence-az-1" {
     }
 
 	tags {
-        Name = "${var.environment}.instance.swarm-worker.admin-persistence.${var.environment}.${lookup(var.availability_zone, "${var.region}.az-1")}",
-        bdth.instance-name-full = "${var.environment}.instance.swarm-worker.admin-persistence.${var.environment}.${lookup(var.availability_zone, "${var.region}.az-1")}"
-        bdth.instance-name = "admin-persistence-${var.region}-az-1"
+        Name = "${var.environment}.instance.swarm-worker.admin-monitoring.${var.environment}.${lookup(var.availability_zone, "${var.region}.az-1")}",
+        bdth.instance-name-full = "${var.environment}.instance.swarm-worker.admin-monitoring.${var.environment}.${lookup(var.availability_zone, "${var.region}.az-1")}"
+        bdth.instance-name = "admin-monitoring-${var.region}-az-1"
         bdth.environment = "${var.environment}"
     	bdth.failure-zone = "${var.region}-az-1"
         bdth.environment-instance-id = "${random_id.env-instance.b64}"
     	bdth.swarm-instance-type = "swarm-worker"
-    	bdth.swarm-node-type = "admin-persistence"
+    	bdth.swarm-node-type = "admin-monitoring"
     	bdth.subnet-type = "public"
     }
 }

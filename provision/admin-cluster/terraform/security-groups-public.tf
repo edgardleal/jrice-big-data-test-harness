@@ -32,37 +32,8 @@ resource "aws_security_group" "public_swarm-manager" {
     }
 }
 
-
-resource "aws_security_group" "public_admin-ui-web" {
-	name = "${var.environment}.bdth-sg.${var.region}-public-admin-ui-web"
-	description = "Security Group for public web ui apps"
-
-	ingress {
-		from_port = 0
-		to_port = 0
-		protocol = "-1"
-		cidr_blocks = ["0.0.0.0/0"]
-	}
-
-	egress {
-		from_port = 0
-		to_port = 0
-		protocol = "-1"
-		cidr_blocks = ["0.0.0.0/0"]
-	}
-
-	vpc_id = "${aws_vpc.bdth_vpc.id}",
-
-	tags {
-        Name = "${var.environment}.sg.${var.region}-public-admin-ui-web",
-        bdth.environment = "${var.environment}",
-        bdth.environment-instance-id = "${random_id.env-instance.b64}"
-    }
-}
-
-
-resource "aws_security_group" "public_admin-persistence" {
-	name = "${var.environment}.bdth-sg.${var.region}-public-admin-persistence"
+resource "aws_security_group" "public_admin-logging" {
+	name = "${var.environment}.bdth-sg.${var.region}-public-admin-logging"
 	description = "Security groups for public web apis"
 
 	ingress {
@@ -82,7 +53,35 @@ resource "aws_security_group" "public_admin-persistence" {
 	vpc_id = "${aws_vpc.bdth_vpc.id}",
 
 	tags {
-        Name = "${var.environment}.sg.${var.region}-public-admin-persistence",
+        Name = "${var.environment}.sg.${var.region}-public-admin-logging",
+        bdth.environment = "${var.environment}",
+        bdth.environment-instance-id = "${random_id.env-instance.b64}"
+    }
+}
+
+
+resource "aws_security_group" "public_admin-monitoring" {
+	name = "${var.environment}.bdth-sg.${var.region}-public-admin-monitoring"
+	description = "Security groups for public web apis"
+
+	ingress {
+		from_port = 0
+		to_port = 0
+		protocol = "-1"
+		cidr_blocks = ["0.0.0.0/0"]
+	}
+
+	egress {
+		from_port = 0
+		to_port = 0
+		protocol = "-1"
+		cidr_blocks = ["0.0.0.0/0"]
+	}
+
+	vpc_id = "${aws_vpc.bdth_vpc.id}",
+
+	tags {
+        Name = "${var.environment}.sg.${var.region}-public-admin-monitoring",
         bdth.environment = "${var.environment}",
         bdth.environment-instance-id = "${random_id.env-instance.b64}"
     }

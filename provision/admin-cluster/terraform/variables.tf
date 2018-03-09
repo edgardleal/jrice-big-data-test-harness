@@ -71,15 +71,15 @@ variable "ec2-instance-type" {
   type = "map"
   default = {
     small.swarm-manager = "t2.micro"
-    small.admin-ui-web = "t2.medium"
-    small.admin-persistence = "t2.large"
+    small.admin-logging = "t2.large"
+    small.admin-monitoring = "t2.large"
 
     medium.swarm-manager = "t2.medium"
-    medium.admin-ui-web = "t2.medium"
-    medium.admin-persistence = "t2.medium"
+    medium.admin-logging = "t2.medium"
+    medium.admin-monitoring = "t2.medium"
 
     large.swarm-manager = "m4.large"
-    large.swarm-manager = "t2.medium"
-    large.admin-persistence = "t2.medium"
+    large.admin-logging = "t2.medium"
+    large.admin-monitoring = "t2.medium"
   }
 }
