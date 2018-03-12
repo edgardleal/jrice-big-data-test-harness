@@ -15,8 +15,8 @@ resource "aws_instance" "swarm-manager-az-1" {
     }
 
 	tags {
-        Name = "${var.environment}.instance.swarm-worker.swarm-manager.${var.environment}.${lookup(var.availability_zone, "${var.region}.az-1")}",
-        bdth.instance-name-full = "${var.environment}.instance.swarm-worker.swarm-manager.${var.environment}.${lookup(var.availability_zone, "${var.region}.az-1")}"
+        Name = "bdth-admin.${var.environment}.instance.swarm-worker.swarm-manager.${var.environment}.${lookup(var.availability_zone, "${var.region}.az-1")}",
+        bdth.instance-name-full = "bdth-admin.${var.environment}.instance.swarm-worker.swarm-manager.${var.environment}.${lookup(var.availability_zone, "${var.region}.az-1")}"
         bdth.instance-name = "swarm-manager-${var.region}-az-1"
         bdth.environment = "${var.environment}"
     	bdth.failure-zone = "${var.region}-az-1"
@@ -40,8 +40,8 @@ resource "aws_instance" "admin-logging-az-1" {
     }
 
 	tags {
-        Name = "${var.environment}.instance.swarm-worker.admin-logging.${var.environment}.${lookup(var.availability_zone, "${var.region}.az-1")}",
-        bdth.instance-name-full = "${var.environment}.instance.swarm-worker.admin-logging.${var.environment}.${lookup(var.availability_zone, "${var.region}.az-1")}"
+        Name = "bdth-admin.${var.environment}.instance.swarm-worker.admin-logging.${var.environment}.${lookup(var.availability_zone, "${var.region}.az-1")}",
+        bdth.instance-name-full = "bdth-admin.${var.environment}.instance.swarm-worker.admin-logging.${var.environment}.${lookup(var.availability_zone, "${var.region}.az-1")}"
         bdth.instance-name = "admin-logging-${var.region}-az-1"
         bdth.environment = "${var.environment}"
     	bdth.failure-zone = "${var.region}-az-1"
@@ -66,8 +66,8 @@ resource "aws_instance" "admin-monitoring-az-1" {
     }
 
 	tags {
-        Name = "${var.environment}.instance.swarm-worker.admin-monitoring.${var.environment}.${lookup(var.availability_zone, "${var.region}.az-1")}",
-        bdth.instance-name-full = "${var.environment}.instance.swarm-worker.admin-monitoring.${var.environment}.${lookup(var.availability_zone, "${var.region}.az-1")}"
+        Name = "bdth-admin.${var.environment}.instance.swarm-worker.admin-monitoring.${var.environment}.${lookup(var.availability_zone, "${var.region}.az-1")}",
+        bdth.instance-name-full = "bdth-admin.${var.environment}.instance.swarm-worker.admin-monitoring.${var.environment}.${lookup(var.availability_zone, "${var.region}.az-1")}"
         bdth.instance-name = "admin-monitoring-${var.region}-az-1"
         bdth.environment = "${var.environment}"
     	bdth.failure-zone = "${var.region}-az-1"

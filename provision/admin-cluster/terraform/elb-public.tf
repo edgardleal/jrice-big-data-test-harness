@@ -17,10 +17,10 @@ resource "aws_security_group" "elb-public" {
 		cidr_blocks = ["0.0.0.0/0"]
 	}
 
-	vpc_id = "${aws_vpc.bdth_vpc.id}",
+	vpc_id = "${aws_vpc.bdth_admin_vpc.id}",
 
 	tags {
-        Name = "${var.environment}.sg.${var.region}-elb",
+        Name = "bdth-admin.${var.environment}.sg.${var.region}-elb",
         bdth.environment = "${var.environment}",
         bdth.environment-instance-id = "${random_id.env-instance.b64}"
     }
@@ -54,7 +54,7 @@ resource "aws_elb" "elb-public" {
     connection_draining_timeout = 400
 
     tags {
-        Name = "${var.environment}-bdth-elb-${var.region}",
+        Name = "bdth-admin.${var.environment}-bdth-elb-${var.region}",
         bdth.environment = "${var.environment}",
         bdth.environment-instance-id = "${random_id.env-instance.b64}"
     }

@@ -8,13 +8,13 @@ resource "random_id" "env-instance" {
 # ---------------------------------------------------------------------------
 # VPC
 # ---------------------------------------------------------------------------
-resource "aws_vpc" "bdth_admin_vpc" {
+resource "aws_vpc" "bdth_emr_vpc" {
 	cidr_block = "${var.vpc_cidr}",
 	enable_dns_support = "true",
 	enable_dns_hostnames  = "true",
 
 	tags {
-        Name = "bdth-admin.${var.environment}.vpc.${var.region}",
+        Name = "bdth-emr.${var.environment}.vpc.${var.region}",
         bdth.environment = "${var.environment}",
         bdth.environment-instance-id = "${random_id.env-instance.b64}"
     }
@@ -24,10 +24,10 @@ resource "aws_vpc" "bdth_admin_vpc" {
 # Internet Gateway
 # ---------------------------------------------------------------------------
 resource "aws_internet_gateway" "bdth_igw" {
-	vpc_id = "${aws_vpc.bdth_admin_vpc.id}",
+	vpc_id = "${aws_vpc.bdth_emr_vpc.id}",
 
 	tags {
-        Name = "bdth-admin.${var.environment}.igw.${var.region}",
+        Name = "bdth-emr.${var.environment}.igw.${var.region}",
         bdth.environment = "${var.environment}",
         bdth.environment-instance-id = "${random_id.env-instance.b64}"
     }
@@ -37,7 +37,7 @@ resource "aws_internet_gateway" "bdth_igw" {
 # Routing table for public subnets
 # ---------------------------------------------------------------------------
 resource "aws_route_table" "public" {
-	vpc_id = "${aws_vpc.bdth_admin_vpc.id}"
+	vpc_id = "${aws_vpc.bdth_emr_vpc.id}"
 
 	route {
 		cidr_block = "0.0.0.0/0"
@@ -45,7 +45,7 @@ resource "aws_route_table" "public" {
 	},
 
 	tags {
-        Name = "bdth-admin.${var.environment}.route-table.${var.region}-public",
+        Name = "bdth-emr.${var.environment}.route-table.${var.region}-public",
         bdth.environment = "${var.environment}",
         bdth.environment-instance-id = "${random_id.env-instance.b64}"
     }
@@ -55,7 +55,7 @@ resource "aws_route_table" "public" {
 # Routing table for private subnets
 # ---------------------------------------------------------------------------
 resource "aws_route_table" "private" {
-	vpc_id = "${aws_vpc.bdth_admin_vpc.id}"
+	vpc_id = "${aws_vpc.bdth_emr_vpc.id}"
 
 	route {
 		cidr_block = "0.0.0.0/0"
@@ -63,7 +63,7 @@ resource "aws_route_table" "private" {
 	},
 
 	tags {
-        Name = "bdth-admin.${var.environment}.route-table.${var.region}-private",
+        Name = "bdth-emr.${var.environment}.route-table.${var.region}-private",
         bdth.environment = "${var.environment}",
         bdth.environment-instance-id = "${random_id.env-instance.b64}"
     }

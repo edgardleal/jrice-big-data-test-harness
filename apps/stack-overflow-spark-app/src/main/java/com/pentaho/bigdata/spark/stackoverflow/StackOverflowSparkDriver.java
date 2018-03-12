@@ -116,36 +116,41 @@ public class StackOverflowSparkDriver {
 
     System.out.println( "\n\n\n\n\nLoading XML File: " + inDir + "/" + XmlFileName + "\n\n");
 
-    Dataset<Row> dataFrame = spark
-      .read()
-      .format( "com.databricks.spark.xml" )
-      .option( "rowTag", tableName )
-      .load( inDir + "/" + XmlFileName );
-
-    // register the table
-    dataFrame.registerTempTable( sourceTableName );
-    dataFrame.cache();
-
     Dataset<Row> df = null;
 
-    df = spark.sql( "Select explode(row) as row from " + sourceTableName );
+    try {
+      Dataset<Row> dataFrame = spark
+        .read()
+        .format( "com.databricks.spark.xml" )
+        .option( "rowTag", tableName )
+        .load( inDir + "/" + XmlFileName );
 
-    //    df.show();
+      // register the table
+      dataFrame.registerTempTable( sourceTableName );
+      dataFrame.cache();
 
-    df = df.select( "row.*" );
+      df = spark.sql( "Select explode(row) as row from " + sourceTableName );
 
-//    df.printSchema();
-//    df.show( 200 );
+      //    df.show();
 
-    // register the table
-    df.registerTempTable( tableName );
-    df.cache();
+      df = df.select( "row.*" );
 
-    System.out.println( "\n\nWriting Avro File: " + outDir + "/" + XmlFileName + "\n\n\n\n\n");
+      //    df.printSchema();
+      //    df.show( 200 );
 
-    df.write()
-      .format("com.databricks.spark.avro")
-      .save(outDir + "/" + XmlFileName + ".avro");
+      // register the table
+      df.registerTempTable( tableName );
+      df.cache();
+
+      System.out.println( "\n\nWriting Avro File: " + outDir + "/" + XmlFileName + "\n\n\n\n\n" );
+
+      df.write()
+        .format( "com.databricks.spark.avro" )
+        .save( outDir + "/" + XmlFileName + ".avro" );
+    } catch ( Exception e ) {
+      System.out.println( "\n\n\n\n\nError trying to process XML:  " + e.getMessage());
+      e.printStackTrace();
+    }
 
     return df;
   }

@@ -23,10 +23,10 @@ resource "aws_security_group" "public_swarm-manager" {
 		cidr_blocks = ["0.0.0.0/0"]
 	}
 
-	vpc_id = "${aws_vpc.bdth_vpc.id}",
+	vpc_id = "${aws_vpc.bdth_admin_vpc.id}",
 
 	tags {
-        Name = "${var.environment}.sg.${var.region}-public-swarm-manager",
+        Name = "bdth-admin.${var.environment}.sg.${var.region}-public-swarm-manager",
         bdth.environment = "${var.environment}",
         bdth.environment-instance-id = "${random_id.env-instance.b64}"
     }
@@ -50,10 +50,10 @@ resource "aws_security_group" "public_admin-logging" {
 		cidr_blocks = ["0.0.0.0/0"]
 	}
 
-	vpc_id = "${aws_vpc.bdth_vpc.id}",
+	vpc_id = "${aws_vpc.bdth_admin_vpc.id}",
 
 	tags {
-        Name = "${var.environment}.sg.${var.region}-public-admin-logging",
+        Name = "bdth-admin.${var.environment}.sg.${var.region}-public-admin-logging",
         bdth.environment = "${var.environment}",
         bdth.environment-instance-id = "${random_id.env-instance.b64}"
     }
@@ -78,10 +78,10 @@ resource "aws_security_group" "public_admin-monitoring" {
 		cidr_blocks = ["0.0.0.0/0"]
 	}
 
-	vpc_id = "${aws_vpc.bdth_vpc.id}",
+	vpc_id = "${aws_vpc.bdth_admin_vpc.id}",
 
 	tags {
-        Name = "${var.environment}.sg.${var.region}-public-admin-monitoring",
+        Name = "bdth-admin.${var.environment}.sg.${var.region}-public-admin-monitoring",
         bdth.environment = "${var.environment}",
         bdth.environment-instance-id = "${random_id.env-instance.b64}"
     }
