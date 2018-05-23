@@ -63,11 +63,11 @@ services:
       labels:
         - "traefik.docker.network=bdth-admin-monitoring_network-proxy"
         - "traefik.port=8080"
-        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}monitoring-proxy.bdth.joericearchitect.com"
+        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}monitoring-proxy.bdth.hitachivantara.com"
         - "bdth.environment-flip=blue"
         - "bdth.application-name=bdth-admin-monitoring-proxy"
         - "bdth.container-name=bdth-admin-monitoring-proxy"
-        - "bdth.domain-name=${ENV_DOMAIN_PREFIX}monitoring-proxy.bdth.joericearchitect.com"
+        - "bdth.domain-name=${ENV_DOMAIN_PREFIX}monitoring-proxy.bdth.hitachivantara.com"
 
   dockerd-exporter:
     image: stefanprodan/caddy:0.10.10
@@ -115,11 +115,11 @@ services:
       labels:
         - "traefik.docker.network=bdth-admin-monitoring_network-proxy"
         - "traefik.port=8080"
-        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}cadvisor.bdth.joericearchitect.com"
+        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}cadvisor.bdth.hitachivantara.com"
         - "bdth.environment-flip=blue"
         - "bdth.application-name=bdth-admin-monitoring-cadvisor"
         - "bdth.container-name=bdth-admin-monitoring-cadvisor"
-        - "bdth.domain-name=${ENV_DOMAIN_PREFIX}cadvisor.bdth.joericearchitect.com"
+        - "bdth.domain-name=${ENV_DOMAIN_PREFIX}cadvisor.bdth.hitachivantara.com"
 
   grafana:
     image: joericearchitect/bdth-admin-grafana:1.0.0
@@ -149,11 +149,11 @@ services:
       labels:
         - "traefik.docker.network=bdth-admin-monitoring_network-proxy"
         - "traefik.port=3000"
-        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}grafana.bdth.joericearchitect.com"
+        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}grafana.bdth.hitachivantara.com"
         - "bdth.environment-flip=blue"
         - "bdth.application-name=bdth-infra-grafana"
         - "bdth.container-name=bdth-infra-grafana"
-        - "bdth.domain-name=${ENV_DOMAIN_PREFIX}grafana.bdth.joericearchitect.com"
+        - "bdth.domain-name=${ENV_DOMAIN_PREFIX}grafana.bdth.hitachivantara.com"
 
   alertmanager:
     image: stefanprodan/swarmprom-alertmanager
@@ -185,11 +185,11 @@ services:
       labels:
         - "traefik.docker.network=bdth-admin-monitoring_network-proxy"
         - "traefik.port=9093"
-        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}alerts.bdth.joericearchitect.com"
+        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}alerts.bdth.hitachivantara.com"
         - "bdth.environment-flip=blue"
         - "bdth.application-name=bdth-infra-alertmanager"
         - "bdth.container-name=bdth-infra-alertmanager"
-        - "bdth.domain-name=${ENV_DOMAIN_PREFIX}alerts.bdth.joericearchitect.com"
+        - "bdth.domain-name=${ENV_DOMAIN_PREFIX}alerts.bdth.hitachivantara.com"
 
   unsee:
     image: cloudflare/unsee:v0.8.0
@@ -209,11 +209,11 @@ services:
       labels:
         - "traefik.docker.network=bdth-admin-monitoring_network-proxy"
         - "traefik.port=8080"
-        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}unsee.bdth.joericearchitect.com"
+        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}unsee.bdth.hitachivantara.com"
         - "bdth.environment-flip=blue"
         - "bdth.application-name=bdth-infra-unsee"
         - "bdth.container-name=bdth-infra-unsee"
-        - "bdth.domain-name=${ENV_DOMAIN_PREFIX}unsee.bdth.joericearchitect.com"
+        - "bdth.domain-name=${ENV_DOMAIN_PREFIX}unsee.bdth.hitachivantara.com"
 
   node-exporter:
     image: stefanprodan/swarmprom-node-exporter
@@ -271,7 +271,7 @@ services:
       labels:
         - "traefik.docker.network=bdth-admin-monitoring_network-proxy"
         - "traefik.port=9109"
-        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}graphite.bdth.joericearchitect.com"
+        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}graphite.bdth.hitachivantara.com"
         - "bdth.environment-flip=blue"
         - "bdth.application-type=time-database"
         - "bdth.application-sub-type=graphite-exporter"
@@ -315,13 +315,13 @@ services:
       labels:
         - "traefik.docker.network=bdth-admin-monitoring_network-proxy"
         - "traefik.port=9090"
-        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}prometheus.bdth.joericearchitect.com"
+        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}prometheus.bdth.hitachivantara.com"
         - "bdth.environment-flip=blue"
         - "bdth.application-type=time-database"
         - "bdth.application-sub-type=prometheus"
         - "bdth.application-name=bdth-infra-prometheus"
         - "bdth.container-name=bdth-infra-prometheus"
-        - "bdth.domain-name=${ENV_DOMAIN_PREFIX}prometheus.bdth.joericearchitect.com"
+        - "bdth.domain-name=${ENV_DOMAIN_PREFIX}prometheus.bdth.hitachivantara.com"
 
   influxdb:
     image: influxdb:1.4.2
@@ -350,11 +350,11 @@ services:
       labels:
         - "traefik.docker.network=bdth-admin-monitoring_network-proxy"
         - "traefik.port=8086"
-        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}influxdb.bdth.joericearchitect.com"
+        - "traefik.frontend.rule=Host:${ENV_DOMAIN_PREFIX}influxdb.bdth.hitachivantara.com"
         - "bdth.environment-flip=blue"
         - "bdth.application-type=time-database"
         - "bdth.application-sub-type=influxdb"
         - "bdth.application-name=bdth-infra-influxdb"
         - "bdth.container-name=bdth-infra-influxdb"
-        - "bdth.domain-name=${ENV_DOMAIN_PREFIX}influxdb.bdth.joericearchitect.com"
+        - "bdth.domain-name=${ENV_DOMAIN_PREFIX}influxdb.bdth.hitachivantara.com"
 
