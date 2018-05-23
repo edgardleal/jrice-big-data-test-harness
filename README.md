@@ -132,3 +132,18 @@ BDTH is designed to be simple to use (althought there is a lot going on under th
 | Grafana UI | grafana.bdth.pentaho.com | Grafana is a visualization tool for viewing metrics.  Spark metrics are captured during tests and stored in prometheus.  Grafana graphs those metrcis so you can see how test jobs performed. |
 | Alert Manager | alerts.bdth.pentaho.com | Alerting manager for the spark cluster.  You can use this tool to set up and view alerts. |
 | Prometheus DB | prometheus.bdth.pentaho.com | Prometheus is a time-series database for capturing metrics.  You can use this UI to get low-level access to data in prometheus and query the metrics data.  9 times out of 10, you will use Grafana to view the data |
+
+
+### Step 3 - Execute a BDTH Test
+
+* Executing a BDTH Test involves running 1 script that will:
+  - Provision an EMR Cluster
+  - Copy Big Data Set from S3 to EMR HDFS
+  - Configure AEL
+  - Run Test
+  - Tear Down EMR Cluster
+  
+* Run this single batch script which will Execute the test
+  - https://github.com/pentaho-jrice/jrice-big-data-test-harness/blob/master/provision/emr-cluster/scripts/run-spark-test.sh
+  
+  
