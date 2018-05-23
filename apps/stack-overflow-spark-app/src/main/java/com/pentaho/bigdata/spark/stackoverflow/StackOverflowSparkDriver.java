@@ -47,7 +47,7 @@ public class StackOverflowSparkDriver {
     SparkContext sc = spark.sparkContext();
     JavaSparkContext jsc = JavaSparkContext.fromSparkContext( sc );
 
-    String inDir = "s3://big-dataset-stackexchange/uncompressed/serverfault.com.7z";
+    String inDir = "hdfs:///user/pentaho/big-data-files/stackexchange/uncompressed/serverfault.com";
     String outDir = "s3://big-dataset-stackexchange/avro/serverfault.com";
 
     Dataset<Row> badgesDataFrame = loadXmlSource( spark, inDir, outDir, BADGES_XML_FILE, BADGES_TABLE_NAME );
@@ -127,7 +127,7 @@ public class StackOverflowSparkDriver {
 
       // register the table
       dataFrame.registerTempTable( sourceTableName );
-      dataFrame.cache();
+//      dataFrame.cache();
 
       df = spark.sql( "Select explode(row) as row from " + sourceTableName );
 
@@ -140,9 +140,9 @@ public class StackOverflowSparkDriver {
 
       // register the table
       df.registerTempTable( tableName );
-      df.cache();
+//      df.cache();
 
-      System.out.println( "\n\nWriting Avro File: " + outDir + "/" + XmlFileName + "\n\n\n\n\n" );
+      System.out.println( "\n\nWriting Avro File: " + outDir + "/" + XmlFileName + ".avro" + "\n\n\n\n\n" );
 
       df.write()
         .format( "com.databricks.spark.avro" )

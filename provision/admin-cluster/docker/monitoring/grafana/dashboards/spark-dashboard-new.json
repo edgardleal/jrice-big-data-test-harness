@@ -1,38 +1,39 @@
 {
-  "id": 1,
-  "title": "Spark Prometheus",
-  "originalTitle": "Spark Prometheus",
-  "tags": [],
-  "style": "dark",
-  "timezone": "browser",
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
   "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
   "hideControls": false,
-  "sharedCrosshair": false,
+  "id": 4,
+  "links": [],
+  "refresh": "5s",
   "rows": [
     {
       "collapse": false,
-      "editable": true,
       "height": "250px",
       "panels": [
         {
           "aliasColors": {},
           "bars": false,
+          "dashLength": 10,
+          "dashes": false,
           "datasource": "Prometheus",
           "editable": true,
           "error": false,
           "fill": 0,
-          "grid": {
-            "leftLogBase": 1,
-            "leftMax": null,
-            "leftMin": 0,
-            "rightLogBase": 1,
-            "rightMax": null,
-            "rightMin": null,
-            "threshold1": null,
-            "threshold1Color": "rgba(216, 200, 27, 0.27)",
-            "threshold2": null,
-            "threshold2Color": "rgba(234, 112, 112, 0.22)"
-          },
+          "grid": {},
           "id": 1,
           "legend": {
             "avg": false,
@@ -60,12 +61,14 @@
               "zindex": 3
             }
           ],
+          "spaceLength": 10,
           "span": 4,
           "stack": false,
           "steppedLine": false,
           "targets": [
             {
               "expr": "filesystem_usage{qty=\"read_bytes\", fs_type=\"hdfs\", application=\"$application_ID\"}",
+              "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{executor_id}}",
               "metric": "filesystem_usage",
@@ -75,6 +78,8 @@
             },
             {
               "expr": "sum(filesystem_usage{qty=\"read_bytes\", fs_type=\"hdfs\", application=\"$application_ID\"})",
+              "format": "time_series",
+              "hide": true,
               "intervalFactor": 2,
               "legendFormat": "total",
               "metric": "filesystem_usage",
@@ -83,40 +88,50 @@
               "target": ""
             }
           ],
+          "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
           "title": "Executor HDFS reads",
           "tooltip": {
             "shared": true,
+            "sort": 0,
             "value_type": "cumulative"
           },
           "type": "graph",
-          "x-axis": true,
-          "y-axis": true,
-          "y_formats": [
-            "short",
-            "short"
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "bytes",
+              "logBase": 1,
+              "max": null,
+              "min": 0,
+              "show": true
+            },
+            {
+              "format": "bytes",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
           ]
         },
         {
           "aliasColors": {},
           "bars": false,
+          "dashLength": 10,
+          "dashes": false,
           "datasource": "Prometheus",
           "editable": true,
           "error": false,
           "fill": 1,
-          "grid": {
-            "leftLogBase": 1,
-            "leftMax": null,
-            "leftMin": null,
-            "rightLogBase": 1,
-            "rightMax": null,
-            "rightMin": null,
-            "threshold1": null,
-            "threshold1Color": "rgba(216, 200, 27, 0.27)",
-            "threshold2": null,
-            "threshold2Color": "rgba(234, 112, 112, 0.22)"
-          },
+          "grid": {},
           "id": 2,
           "legend": {
             "avg": false,
@@ -136,12 +151,14 @@
           "points": false,
           "renderer": "flot",
           "seriesOverrides": [],
+          "spaceLength": 10,
           "span": 4,
           "stack": true,
           "steppedLine": false,
           "targets": [
             {
               "expr": "filesystem_usage{qty=\"write_bytes\", fs_type=\"hdfs\", application=\"$application_ID\"}",
+              "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{executor_id}}",
               "metric": "filesystem_usage",
@@ -150,40 +167,50 @@
               "target": ""
             }
           ],
+          "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
           "title": "Executor HDFS writes",
           "tooltip": {
             "shared": true,
+            "sort": 0,
             "value_type": "cumulative"
           },
           "type": "graph",
-          "x-axis": true,
-          "y-axis": true,
-          "y_formats": [
-            "short",
-            "short"
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "bytes",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
           ]
         },
         {
           "aliasColors": {},
           "bars": false,
+          "dashLength": 10,
+          "dashes": false,
           "datasource": "Prometheus",
           "editable": true,
           "error": false,
           "fill": 1,
-          "grid": {
-            "leftLogBase": 1,
-            "leftMax": null,
-            "leftMin": null,
-            "rightLogBase": 1,
-            "rightMax": null,
-            "rightMin": null,
-            "threshold1": null,
-            "threshold1Color": "rgba(216, 200, 27, 0.27)",
-            "threshold2": null,
-            "threshold2Color": "rgba(234, 112, 112, 0.22)"
-          },
+          "grid": {},
           "id": 3,
           "legend": {
             "avg": false,
@@ -208,12 +235,14 @@
               "yaxis": 2
             }
           ],
+          "spaceLength": 10,
           "span": 4,
           "stack": true,
           "steppedLine": false,
           "targets": [
             {
               "expr": "avg(rate(filesystem_usage{qty=\"read_bytes\", fs_type=\"hdfs\", application=\"$application_ID\"}[1m]))",
+              "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "average",
               "metric": "filesystem_usage",
@@ -223,6 +252,7 @@
             },
             {
               "expr": "sum(rate(filesystem_usage{qty=\"read_bytes\", fs_type=\"hdfs\", application=\"$application_ID\"}[1m]))",
+              "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "total",
               "metric": "filesystem_usage",
@@ -231,48 +261,62 @@
               "target": ""
             }
           ],
+          "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
           "title": "HDFS Read Rate / s",
           "tooltip": {
             "shared": true,
+            "sort": 0,
             "value_type": "cumulative"
           },
           "type": "graph",
-          "x-axis": true,
-          "y-axis": true,
-          "y_formats": [
-            "short",
-            "short"
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "bytes",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "bytes",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
           ]
         }
       ],
-      "title": "HDFS stats"
+      "repeat": null,
+      "repeatIteration": null,
+      "repeatRowId": null,
+      "showTitle": false,
+      "title": "HDFS stats",
+      "titleSize": "h6"
     },
     {
       "collapse": false,
-      "editable": true,
       "height": "250px",
       "panels": [
         {
           "aliasColors": {},
           "bars": false,
+          "dashLength": 10,
+          "dashes": false,
           "datasource": "Prometheus",
           "editable": true,
           "error": false,
           "fill": 0,
-          "grid": {
-            "leftLogBase": 1,
-            "leftMax": null,
-            "leftMin": 0,
-            "rightLogBase": 1,
-            "rightMax": null,
-            "rightMin": null,
-            "threshold1": null,
-            "threshold1Color": "rgba(216, 200, 27, 0.27)",
-            "threshold2": null,
-            "threshold2Color": "rgba(234, 112, 112, 0.22)"
-          },
+          "grid": {},
           "id": 4,
           "legend": {
             "avg": false,
@@ -292,12 +336,14 @@
           "points": false,
           "renderer": "flot",
           "seriesOverrides": [],
+          "spaceLength": 10,
           "span": 6,
           "stack": false,
           "steppedLine": false,
           "targets": [
             {
               "expr": "jvm_memory_usage{mem_type=\"heap\", qty=\"usage\", application=\"$application_ID\", executor_id=\"driver\"}",
+              "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{executor_id}}",
               "metric": "jvm_memory_usage",
@@ -306,40 +352,51 @@
               "target": ""
             }
           ],
+          "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
           "title": "Driver Heap Usage",
           "tooltip": {
             "shared": true,
+            "sort": 0,
             "value_type": "cumulative"
           },
           "type": "graph",
-          "x-axis": true,
-          "y-axis": true,
-          "y_formats": [
-            "short",
-            "short"
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "gbytes",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "bytes",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
           ]
         },
         {
           "aliasColors": {},
           "bars": false,
+          "dashLength": 10,
+          "dashes": false,
           "datasource": "Prometheus",
           "editable": true,
           "error": false,
           "fill": 1,
-          "grid": {
-            "leftLogBase": 1,
-            "leftMax": null,
-            "leftMin": null,
-            "rightLogBase": 1,
-            "rightMax": null,
-            "rightMin": null,
-            "threshold1": null,
-            "threshold1Color": "rgba(216, 200, 27, 0.27)",
-            "threshold2": null,
-            "threshold2Color": "rgba(234, 112, 112, 0.22)"
-          },
+          "grid": {},
           "id": 5,
           "legend": {
             "avg": false,
@@ -359,12 +416,14 @@
           "points": false,
           "renderer": "flot",
           "seriesOverrides": [],
+          "spaceLength": 10,
           "span": 6,
           "stack": false,
           "steppedLine": false,
           "targets": [
             {
               "expr": "jvm_memory_pools{executor_id=\"driver\", application=\"$application_ID\",qty=\"used\"}",
+              "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{mem_type}}",
               "metric": "jvm_memory_pools",
@@ -373,40 +432,50 @@
               "target": ""
             }
           ],
+          "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
           "title": "Driver JVM Memory Pools",
           "tooltip": {
             "shared": true,
+            "sort": 0,
             "value_type": "cumulative"
           },
           "type": "graph",
-          "x-axis": true,
-          "y-axis": true,
-          "y_formats": [
-            "short",
-            "short"
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "bytes",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
           ]
         },
         {
           "aliasColors": {},
           "bars": false,
+          "dashLength": 10,
+          "dashes": false,
           "datasource": "Prometheus",
           "editable": true,
           "error": false,
           "fill": 0,
-          "grid": {
-            "leftLogBase": 1,
-            "leftMax": null,
-            "leftMin": null,
-            "rightLogBase": 1,
-            "rightMax": null,
-            "rightMin": null,
-            "threshold1": null,
-            "threshold1Color": "rgba(216, 200, 27, 0.27)",
-            "threshold2": null,
-            "threshold2Color": "rgba(234, 112, 112, 0.22)"
-          },
+          "grid": {},
           "id": 6,
           "legend": {
             "avg": false,
@@ -426,12 +495,14 @@
           "points": false,
           "renderer": "flot",
           "seriesOverrides": [],
+          "spaceLength": 10,
           "span": 4,
           "stack": false,
           "steppedLine": false,
           "targets": [
             {
               "expr": "jvm_memory_usage{mem_type=\"heap\", qty=\"usage\", application=\"$application_ID\", executor_id!~\"driver\"} ",
+              "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{executor_id}}",
               "metric": "jvm_memory_usage",
@@ -440,40 +511,50 @@
               "target": ""
             }
           ],
+          "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
           "title": "Executor Heap Usage",
           "tooltip": {
             "shared": true,
+            "sort": 0,
             "value_type": "cumulative"
           },
           "type": "graph",
-          "x-axis": true,
-          "y-axis": true,
-          "y_formats": [
-            "short",
-            "short"
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "gbytes",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
           ]
         },
         {
           "aliasColors": {},
           "bars": false,
+          "dashLength": 10,
+          "dashes": false,
           "datasource": "Prometheus",
           "editable": true,
           "error": false,
           "fill": 0,
-          "grid": {
-            "leftLogBase": 1,
-            "leftMax": null,
-            "leftMin": null,
-            "rightLogBase": 1,
-            "rightMax": null,
-            "rightMin": null,
-            "threshold1": null,
-            "threshold1Color": "rgba(216, 200, 27, 0.27)",
-            "threshold2": null,
-            "threshold2Color": "rgba(234, 112, 112, 0.22)"
-          },
+          "grid": {},
           "id": 7,
           "legend": {
             "avg": false,
@@ -493,6 +574,7 @@
           "points": false,
           "renderer": "flot",
           "seriesOverrides": [],
+          "spaceLength": 10,
           "span": 4,
           "stack": false,
           "steppedLine": false,
@@ -507,40 +589,50 @@
               "target": ""
             }
           ],
+          "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
           "title": "Executor Eden-Space",
           "tooltip": {
             "shared": true,
+            "sort": 0,
             "value_type": "cumulative"
           },
           "type": "graph",
-          "x-axis": true,
-          "y-axis": true,
-          "y_formats": [
-            "short",
-            "short"
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
           ]
         },
         {
           "aliasColors": {},
           "bars": false,
+          "dashLength": 10,
+          "dashes": false,
           "datasource": "Prometheus",
           "editable": true,
           "error": false,
           "fill": 0,
-          "grid": {
-            "leftLogBase": 1,
-            "leftMax": null,
-            "leftMin": null,
-            "rightLogBase": 1,
-            "rightMax": null,
-            "rightMin": null,
-            "threshold1": null,
-            "threshold1Color": "rgba(216, 200, 27, 0.27)",
-            "threshold2": null,
-            "threshold2Color": "rgba(234, 112, 112, 0.22)"
-          },
+          "grid": {},
           "id": 9,
           "legend": {
             "avg": false,
@@ -560,6 +652,7 @@
           "points": false,
           "renderer": "flot",
           "seriesOverrides": [],
+          "spaceLength": 10,
           "span": 4,
           "stack": false,
           "steppedLine": false,
@@ -574,40 +667,50 @@
               "target": ""
             }
           ],
+          "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
           "title": "Executor Old-Gen",
           "tooltip": {
             "shared": true,
+            "sort": 0,
             "value_type": "cumulative"
           },
           "type": "graph",
-          "x-axis": true,
-          "y-axis": true,
-          "y_formats": [
-            "short",
-            "short"
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
           ]
         },
         {
           "aliasColors": {},
           "bars": false,
+          "dashLength": 10,
+          "dashes": false,
           "datasource": "Prometheus",
           "editable": true,
           "error": false,
           "fill": 1,
-          "grid": {
-            "leftLogBase": 1,
-            "leftMax": null,
-            "leftMin": null,
-            "rightLogBase": 1,
-            "rightMax": null,
-            "rightMin": null,
-            "threshold1": null,
-            "threshold1Color": "rgba(216, 200, 27, 0.27)",
-            "threshold2": null,
-            "threshold2Color": "rgba(234, 112, 112, 0.22)"
-          },
+          "grid": {},
           "id": 10,
           "legend": {
             "avg": false,
@@ -632,6 +735,7 @@
               "yaxis": 2
             }
           ],
+          "spaceLength": 10,
           "span": 12,
           "stack": false,
           "steppedLine": false,
@@ -645,27 +749,84 @@
               "target": ""
             }
           ],
+          "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
           "title": "Tasks",
           "tooltip": {
             "shared": true,
+            "sort": 0,
             "value_type": "cumulative"
           },
           "type": "graph",
-          "x-axis": true,
-          "y-axis": true,
-          "y_formats": [
-            "short",
-            "short"
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
           ]
         }
       ],
-      "title": "New row"
+      "repeat": null,
+      "repeatIteration": null,
+      "repeatRowId": null,
+      "showTitle": false,
+      "title": "New row",
+      "titleSize": "h6"
     }
   ],
+  "schemaVersion": 14,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "allFormat": "glob",
+        "allValue": null,
+        "current": {
+          "text": "application_1520912333757_0003",
+          "value": "application_1520912333757_0003"
+        },
+        "datasource": null,
+        "hide": 0,
+        "includeAll": false,
+        "label": null,
+        "multi": false,
+        "multiFormat": "glob",
+        "name": "application_ID",
+        "options": [],
+        "query": "label_values(application)",
+        "refresh": 1,
+        "refresh_on_load": false,
+        "regex": "",
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      }
+    ]
+  },
   "time": {
-    "from": "now-5m",
+    "from": "now-1h",
     "to": "now"
   },
   "timepicker": {
@@ -694,168 +855,7 @@
       "30d"
     ]
   },
-  "templating": {
-    "list": [
-      {
-        "allFormat": "glob",
-        "current": {
-          "text": "application_1443599818521_3111",
-          "value": "application_1443599818521_3111"
-        },
-        "datasource": null,
-        "includeAll": false,
-        "multi": false,
-        "multiFormat": "glob",
-        "name": "application_ID",
-        "options": [
-          {
-            "text": "application_1443599818521_3100",
-            "value": "application_1443599818521_3100",
-            "selected": false
-          },
-          {
-            "text": "application_1443599818521_3101",
-            "value": "application_1443599818521_3101",
-            "selected": false
-          },
-          {
-            "text": "application_1443599818521_3102",
-            "value": "application_1443599818521_3102",
-            "selected": false
-          },
-          {
-            "text": "application_1443599818521_3103",
-            "value": "application_1443599818521_3103",
-            "selected": false
-          },
-          {
-            "text": "application_1443599818521_3104",
-            "value": "application_1443599818521_3104",
-            "selected": false
-          },
-          {
-            "text": "application_1443599818521_3105",
-            "value": "application_1443599818521_3105",
-            "selected": false
-          },
-          {
-            "text": "application_1443599818521_3107",
-            "value": "application_1443599818521_3107",
-            "selected": false
-          },
-          {
-            "text": "application_1443599818521_3108",
-            "value": "application_1443599818521_3108",
-            "selected": false
-          },
-          {
-            "text": "application_1443599818521_3109",
-            "value": "application_1443599818521_3109",
-            "selected": false
-          },
-          {
-            "text": "application_1443599818521_3110",
-            "value": "application_1443599818521_3110",
-            "selected": false
-          },
-          {
-            "text": "application_1443599818521_3111",
-            "value": "application_1443599818521_3111",
-            "selected": true
-          },
-          {
-            "text": "application_1443599818521_3112",
-            "value": "application_1443599818521_3112",
-            "selected": false
-          },
-          {
-            "text": "application_1443599818521_3120",
-            "value": "application_1443599818521_3120",
-            "selected": false
-          },
-          {
-            "text": "application_1443599818521_3121",
-            "value": "application_1443599818521_3121",
-            "selected": false
-          },
-          {
-            "text": "application_1443599818521_3122",
-            "value": "application_1443599818521_3122",
-            "selected": false
-          },
-          {
-            "text": "application_1443599818521_3123",
-            "value": "application_1443599818521_3123",
-            "selected": false
-          },
-          {
-            "text": "application_1443599818521_3124",
-            "value": "application_1443599818521_3124",
-            "selected": false
-          },
-          {
-            "text": "application_1443599818521_3125",
-            "value": "application_1443599818521_3125",
-            "selected": false
-          },
-          {
-            "text": "application_1443599818521_3126",
-            "value": "application_1443599818521_3126",
-            "selected": false
-          },
-          {
-            "text": "application_1443599818521_3128",
-            "value": "application_1443599818521_3128",
-            "selected": false
-          },
-          {
-            "text": "application_1443599818521_3129",
-            "value": "application_1443599818521_3129",
-            "selected": false
-          },
-          {
-            "text": "application_1443599818521_3130",
-            "value": "application_1443599818521_3130",
-            "selected": false
-          },
-          {
-            "text": "application_1443599818521_3131",
-            "value": "application_1443599818521_3131",
-            "selected": false
-          },
-          {
-            "text": "application_1443599818521_3132",
-            "value": "application_1443599818521_3132",
-            "selected": false
-          },
-          {
-            "text": "local-1450275288942",
-            "value": "local-1450275288942",
-            "selected": false
-          },
-          {
-            "text": "local-1450276043667",
-            "value": "local-1450276043667",
-            "selected": false
-          },
-          {
-            "text": "local-1450276051171",
-            "value": "local-1450276051171",
-            "selected": false
-          }
-        ],
-        "query": "label_values(application)",
-        "refresh": true,
-        "refresh_on_load": false,
-        "type": "query"
-      }
-    ]
-  },
-  "annotations": {
-    "list": []
-  },
-  "refresh": "5s",
-  "schemaVersion": 8,
-  "version": 0,
-  "links": []
+  "timezone": "browser",
+  "title": "Spark Prometheus",
+  "version": 3
 }

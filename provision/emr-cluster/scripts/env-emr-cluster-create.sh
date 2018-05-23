@@ -16,11 +16,13 @@ source $DIR/setenv.sh
 export TERRAFORM_DIR=$DIR/../terraform
 export ENVIRONMENT=prod
 export ENVIRONMENT_DOMAIN_PREFIX=
-export EMR_CLUSTER_CORE_INSTANCE_COUNT=2
+export ENVIRONMENT_SIZE=medium
+export EMR_CLUSTER_CORE_INSTANCE_COUNT=10
 
 cd $TERRAFORM_DIR
 
 time terraform apply \
   -var "environment=$ENVIRONMENT" \
-  -var "environment-domain-prefix=$ENVIRONMENT_DOMAIN_PREFIX"\
+  -var "environment-domain-prefix=$ENVIRONMENT_DOMAIN_PREFIX" \
+  -var "environment-size=$ENVIRONMENT_SIZE" \
   -var "emr-cluster-core-instance-count=$EMR_CLUSTER_CORE_INSTANCE_COUNT"

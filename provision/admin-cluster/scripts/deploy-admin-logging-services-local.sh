@@ -19,16 +19,13 @@ PLAYBOOK_VAR_ENV=prod
 PLAYBOOK_VAR_DOMAIN_PREFIX=""
 PLAYBOOK_VAR_DOMAIN_NAME=$BDTH_DOMAIN_NAME
 STACK_FILE_DIR=../docker/logging
-STACK_FILE_NAME=docker-compose.yml
+STACK_FILE_NAME=docker-compose-local.yml
 
-cd $BDTH_ADMIN_PLAYBOOK_DIR
+echo "."
+echo "*********************************************************************************"
+echo "   Deploy Docker Logging Stack..."
+echo "*********************************************************************************"
 
-time ansible-playbook \
-  -i $EC2_INVENTORY_FILE \
-  -v \
-  -u ubuntu \
-  -e env=$PLAYBOOK_VAR_ENV \
-  -e env_domain_prefix=$PLAYBOOK_VAR_DOMAIN_PREFIX \
-  -e stack_file_dir=$STACK_FILE_DIR \
-  -e stack_file_name=$STACK_FILE_NAME \
-  --private-key $BDTH_AWS_KEY_FILE_PATH $PLAYBOOK_FILE
+time ENV_DOMAIN_PREFIX=$PLAYBOOK_VAR_DOMAIN_PREFIX \
+  sudo docker stack deploy bdth-admin-logging \
+  -c $STACK_FILE_DIR/$STACK_FILE_NAME 

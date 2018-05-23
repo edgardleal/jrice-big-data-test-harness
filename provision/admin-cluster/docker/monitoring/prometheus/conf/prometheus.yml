@@ -28,10 +28,10 @@ scrape_configs:
       type: 'A'
       port: 8080
 
-  - job_name: 'graphite-exporter'
+  - job_name: 'spark-metrics'
     dns_sd_configs:
     - names:
-      - 'tasks.graphite-exporter'
+      - 'tasks.spark-metrics'
       type: 'A'
       port: 9108
 
